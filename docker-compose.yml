@@ -1,0 +1,20 @@
+version: '3.3'
+services:
+  db-backend:
+    image: biarms/mysql:5.5.60
+    restart: always
+    environment:
+      MYSQL_ROOT_USER: backend
+      MYSQL_ROOT_PASSWORD: backend
+      MYSQL_USER: backend
+      MYSQL_PASSWORD: backend
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3309:3306'                     
+    expose:
+      # Opens port 3309 on the container
+      - '3309'
+      # Where our data will be persisted
+    volumes:
+      - ./data-backend:/var/lib/mysql
+
