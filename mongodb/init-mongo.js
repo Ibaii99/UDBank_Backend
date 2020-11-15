@@ -27,5 +27,7 @@ db.createUser(
 db.createCollection('metadata');
 db.createCollection('markets');
 db.createCollection('users');
+db.createCollection('sessions');
+
 
 // db.createCollection('token');

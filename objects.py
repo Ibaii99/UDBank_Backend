@@ -68,5 +68,8 @@ from flask import Response, request
 import requests
 
 class Authorization:
-    def authorize(self, api_key, userId):
+    def authorize_user(self, api_key, userId):
+        return True
+    
+    def authorize_front(self, api_key):
         return True

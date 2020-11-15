@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, jsonify
 import requests
 import logging
 import json
@@ -23,7 +23,7 @@ def get_brand_info(brand):
 @markets_blueprint.route("/<exchange>/stocks", methods=["GET"])
 def get_all_stocks_from_market(exchange):
     r = requests.get(url + "/symbol", headers=headers, params={'exchange': exchange})
-    return json.dumps(r.json())
+    return jsonify(json.dumps(r.json()))
 
 @markets_blueprint.route("/exchanges", methods=["GET"])
 def get_all_markets():
