@@ -2,25 +2,19 @@ from flask import Flask, Blueprint, abort, request, Response, jsonify
 from flask_cors import CORS, cross_origin
 
 import json
-from routing import markets, users
+from routing import api_markets, api_users
 import config
 import logging
 
-from objects import Authorization
+from logic.authorization import Authorization
 
 app = Flask(__name__)
-app.register_blueprint(markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
-app.register_blueprint(users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
+app.register_blueprint(api_markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
+app.register_blueprint(api_users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
-app.config['CORS_HEADERS'] = 'Content-Type'
 
-
-
-
-
-
-auth = Authorization()
+app.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
 
 @app.route('/', methods=["GET"])
 @cross_origin()
@@ -52,21 +46,30 @@ def check_api_key():
         return resp
     else:
         logging.warning("BEFORE")
-        logging.warning(request.headers)
+        # logging.warning(request.headers)
         api_key = request.headers.get("X-Api-Key")
-        userId = request.headers.get("user-id")
+        try:
+            userId = request.headers.get("Authorization")
+        except:
+            userId = None
+
         if (api_key is not None and userId is not None):
-            if not auth.authorize_user(api_key, userId):  
+            if not Authorization.authorize_user(userId) or not Authorization.authorize_front(api_key):  
                 abort(403)
+            else:
+                pass
         elif (api_key is not None and userId is None):
-            if not auth.authorize_front(api_key):
+            if not Authorization.authorize_front(api_key) and is_get_token_route(request.url_rule):
                 abort(403)
-        elif (api_key is None and userId is None):
+            else: 
+                pass
+        else:
             abort(403)
 
 @app.after_request
 def save_history(response):
     logging.warning("After")
+
     # logging.warning(response)
     # logging.warning(request)
     # logging.warning(request.headers)
@@ -75,8 +78,13 @@ def save_history(response):
     # logging.warning(request.url_rule)   
     return response
 
-
-
+def is_get_token_route(route):
+    login_route= "/api/v1/user/login"
+    register_route= "/api/v1/user/register"
+    if route == login_route or route == register_route:
+        return True
+    else:
+        return False
 
 
 @app.errorhandler(403)

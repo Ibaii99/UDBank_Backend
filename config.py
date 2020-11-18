@@ -14,3 +14,5 @@ MONGO_PASS = 'root'
 MONGO_AUTHENTICATE_DB = "admin"
 #JWT
 JWT_SIGN_KEY = "secret"
+#HASH
+SALT=b'\\a\xb9?\xa8P\xc6h\x85\xed)L\xa6\x99e\x0f\x86\xcf\xe8{2W\xc2\x17:\x1bR\xf8\x1b:\x88b'
