@@ -23,3 +23,4 @@ pip-delete-this-directory.txt
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
