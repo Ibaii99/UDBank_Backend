@@ -4,6 +4,7 @@ from utils import HASH
 
 class User:
     def __init__(self):
+        self.id = ""
         self.username= ""
         self.email= ""
         self.password= ""
@@ -17,6 +18,7 @@ class User:
         self.interested_in= []
 
     def initiate(self, name, mail, passwd, first_name, last_name, address, city, country, postal_code, about, interests):
+        self.id = str(uuid.uuid1())
         self.username= name
         self.email= mail
         self.password= passwd
@@ -31,6 +33,7 @@ class User:
 
     def jsonify(self):
         return {
+                "id": self.id,
                 "username": self.username,
                 "email": self.email,
                 "password": self.password,
@@ -45,11 +48,9 @@ class User:
                 }
 
     def json_cookie_payload(self):
-        my_id = uuid.uuid1()
-
         return {
                 "username": self.username,
-                "session_id": str(my_id)
+                "session_id": self.id
                 }
 
     def __repr__(self):
@@ -67,6 +68,7 @@ class User:
                 }
 
     def load_json(self, json):
+        self.id = str(uuid.uuid1())
         self.username= json["username"]
         self.email= json["email"]
         self.password= json["password"]

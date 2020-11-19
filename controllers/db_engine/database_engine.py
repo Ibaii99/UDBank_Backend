@@ -19,7 +19,6 @@ class DatabaseEngine:
         self.collection_users = db['users']
         self.collection_sessions = db['sessions']
 
-
     def get_markets(self):
         return list(self.collection_markets.find())
     
@@ -30,7 +29,7 @@ class DatabaseEngine:
     
     def is_password_correct(self, username: str, password:str):
         try:
-            user = self.collection_users.find_one({"username": username, 'password':password})
+            user = self.collection_users.find_one({"username": username, 'password': HASH.hash(password)})
             if user is not None:
                 return True 
             else:
@@ -65,26 +64,40 @@ class DatabaseEngine:
 
     
     def save_session(self, session_data):
-        _session_hash = session_data["session_id"]
+        logging.warning(session_data)
+
+        _session_id = session_data["session_id"]
         _username = session_data["username"]
         timestamp = datetime.datetime.now().timestamp()
         session= {
             'username': HASH.hash(_username),
-            'session_id': HASH.hash(_session_hash),
+            'session_id': HASH.hash(_session_id),
             'timestamp': timestamp
         }
+        logging.warning(session)
         self.collection_sessions.insert_one(session)
 
         return session
     
-    def remove_session(self, session_data):
-        removed = self.collection_sessions.delete_one({"session_id": session_data["session_id"], "username": session_data["username"]})
+    def remove_session(self, session):
+        logging.warning(session)
+
+        _session= {
+            'username': HASH.hash(session.get("username")),
+            'session_id': HASH.hash(session.get("session_id"))
+        }
+        logging.warning(_session)
+        removed = self.collection_sessions.delete_one(_session)
         if removed:
             return True
         return False
 
     def get_session(self, session):
-        s = self.collection_sessions.find_one({"username": session["username"], "session_id": session["session_id"]})
+        _session= {
+            'username': HASH.hash(session.get("username")),
+            'session_id': HASH.hash(session.get("session_id"))
+        }
+        s = self.collection_sessions.find_one(_session)
         if s is not None:
             return s
         else:
