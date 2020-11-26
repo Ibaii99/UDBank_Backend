@@ -8,7 +8,14 @@ import logging
 
 from logic.authorization import Authorization
 
-app = None
+app = Flask(__name__)
+app.register_blueprint(api_markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
+app.register_blueprint(api_users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
+
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
+
+app.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
+
 
 def create_app():
     global app
