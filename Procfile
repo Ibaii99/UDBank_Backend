@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:3000 api:api
+web: gunicorn --bind 0.0.0.0:3000 "api:create_app()"

@@ -8,13 +8,17 @@ import logging
 
 from logic.authorization import Authorization
 
-app = Flask(__name__)
-app.register_blueprint(api_markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
-app.register_blueprint(api_users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
+def create_app():
+    app = Flask(__name__)
+    app.register_blueprint(api_markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
+    app.register_blueprint(api_users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
 
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
+    cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-app.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
+    app.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
+    return app
+
+
 
 @app.route('/', methods=["GET"])
 @cross_origin()
