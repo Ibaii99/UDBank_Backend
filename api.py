@@ -8,7 +8,10 @@ import logging
 
 from logic.authorization import Authorization
 
+app = None
+
 def create_app():
+    global app
     app = Flask(__name__)
     app.register_blueprint(api_markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
     app.register_blueprint(api_users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
@@ -99,5 +102,6 @@ def page_not_found(e):
     return jsonify(json.dumps("Incorrect username or password")), 401
 
 if __name__ == '__main__':
+    create_app()
     app.run(debug=True, host=config.HOST, port=config.PORT)
 
