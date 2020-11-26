@@ -10,7 +10,8 @@ from utils import HASH
 class DatabaseEngine:
     def __init__(self):
         # if you are password has '@' then you might need to escape hence we are using "urllib.parse.quote_plus()" 
-        client = MongoClient(f'mongodb://{MONGO_USER}:{urllib.parse.quote_plus(MONGO_PASS)}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_AUTHENTICATE_DB}')
+        # client = MongoClient(f'mongodb://{MONGO_USER}:{urllib.parse.quote_plus(MONGO_PASS)}@{MONGO_HOST}/{MONGO_AUTHENTICATE_DB}')
+        client = MongoClient("mongodb+srv://udbank:1qwerty78@cluster0.fg8js.mongodb.net/udbank?retryWrites=true&w=majority")
         
         db = client.udbank
         

@@ -94,6 +94,6 @@ def page_not_found(e):
 def page_not_found(e):
     return jsonify(json.dumps("Incorrect username or password")), 401
 
-if __name__ == '__main__':
-    app.run(debug=True, host=config.HOST, port=config.PORT)
+# if __name__ == '__main__':
+#     app.run(debug=True, host=config.HOST, port=config.PORT)
 
