@@ -9,22 +9,22 @@ import logging
 from logic.authorization import Authorization
 
 app = Flask(__name__)
-app.register_blueprint(api_markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
-app.register_blueprint(api_users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
+application.register_blueprint(api_markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
+application.register_blueprint(api_users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-app.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
+application.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
 
-@app.route('/', methods=["GET"])
+@application.route('/', methods=["GET"])
 @cross_origin()
 def hello():
     return "Hello World!"
 
-@app.before_request
+@application.before_request
 def check_api_key():
     if request.method == 'OPTIONS':
-        resp = app.make_default_options_response()
+        resp = application.make_default_options_response()
 
         headers = None
         if 'ACCESS_CONTROL_REQUEST_HEADERS' in request.headers:
@@ -65,7 +65,7 @@ def check_api_key():
         else:
             abort(403)
 
-@app.after_request
+@application.after_request
 def save_history(response):
     logging.warning("After")
 
@@ -86,14 +86,14 @@ def is_get_token_route(route):
         return False
 
 
-@app.errorhandler(403)
+@application.errorhandler(403)
 def page_not_found(e):
     return jsonify(json.dumps("Forbbiden acces, invalid api-key")), 403
 
-@app.errorhandler(401)
+@application.errorhandler(401)
 def page_not_found(e):
     return jsonify(json.dumps("Incorrect username or password")), 401
 
 if __name__ == '__main__':
-    app.run(debug=True, host=config.HOST, port=config.PORT)
+    application.run(debug=True, host=config.HOST, port=config.PORT)
 
