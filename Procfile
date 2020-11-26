@@ -1,1 +1,1 @@
-web: gunicorn api
+web: gunicorn --blind 0.0.0.0:3000 api:api
