@@ -26,7 +26,8 @@ def create_app():
     cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
     app.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
-    return app
+    return app.run(debug=False, host=config.HOST, port=config.PORT)
+
 
 
 
@@ -109,6 +110,5 @@ def page_not_found(e):
     return jsonify(json.dumps("Incorrect username or password")), 401
 
 if __name__ == '__main__':
-    create_app()
     app.run(debug=True, host=config.HOST, port=config.PORT)
 
