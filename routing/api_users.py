@@ -14,6 +14,7 @@ from utils import HASH
 from config import JWT_SIGN_KEY
 from logic.user import User
 
+from utils import COOKIE_MANAGER
 from logic.authorization import Authorization
 
 users_blueprint = Blueprint("user", __name__)
@@ -28,10 +29,9 @@ def echo():
 @users_blueprint.route("/login", methods=["POST"])
 @cross_origin()
 def login():
-    logging.warning('Log in:')
     username = request.json.get('username')
     password = request.json.get('password')
-    is_correct = Authorization.check_password(username, password)
+    is_correct = Authorization.check_password(username, HASH.hash(password))
     if is_correct:
         u = users_db.get(username)
         if u:
@@ -43,7 +43,6 @@ def login():
 @users_blueprint.route("/logout", methods=["DELETE"])
 @cross_origin()
 def logout():
-    logging.warning("Logout:")
     removed = Authorization.remove_session(request)
     if removed:
         return jsonify({"Message": "Logged out"}), 200
@@ -59,20 +58,42 @@ def register():
     u.password = HASH.hash(u.password)
     cookie = users_db.save(u)
     if cookie:
-        sessions_db.save(u.json_cookie_payload())
+        Authorization.save_session(u)
         return jsonify({ 'Authorization' : encode(u.json_cookie_payload()), "Message": "Registered"}), 200
     abort(401)
 
+@users_blueprint.route("/info", methods=["GET"])
+@cross_origin()
+def get_user():
+    session_cookie = COOKIE_MANAGER.get_authorization_token_decoded(request)
+    if session_cookie:
+        session = sessions_db.get(session_cookie)
+        if session:
+            user = users_db.get(session_cookie.get("username"))
+            if user:
+                return jsonify(json.dumps(user.safe_jsonify())), 200
+    abort(401)
+
 @users_blueprint.route("/info", methods=["POST"])
+@cross_origin()
 def modify_user():
-    u = check_token(request)
-    if u:
-        new_u_json = get_new_token_decoded(request)
-        if new_u_json:
-            u2 = User()
-            u2.load_json(new_u_json)
-            user_new = users_db.modify(u.username,u.password, u2)
-            return u2.jsonify()
+    logging.warning("llega")
+    session_cookie = COOKIE_MANAGER.get_authorization_token_decoded(request)
+    if session_cookie:
+        session = sessions_db.get(session_cookie)
+        if session:
+            user = users_db.get(session_cookie.get("username"))
+            if user:    
+                user2 = User()
+                request.get_json()["password"] = user.password
+                user2.load_json(request.get_json())
+                modify = users_db.modify(user.username, user.password, user2)
+                if modify:
+                    removed = Authorization.remove_session(request)
+                    if removed:       
+                        Authorization.save_session(user2)
+                    return jsonify({ 'Authorization' : encode(user2.json_cookie_payload()), "Message": "Modified"}), 200
+
     abort(401)
 
 
@@ -89,7 +110,6 @@ def encode(token):
 
 def get_authorization_token_decoded(request):
     encoded_token = get_encoded_token(request)
-    logging.warning(encoded_token)
     if encoded_token:
         decoded_token = decode_token(encoded_token)
         if decoded_token:
@@ -99,7 +119,6 @@ def get_authorization_token_decoded(request):
 
 def get_encoded_token(request):
     auth_header = request.headers.get('Authorization')
-    logging.warning(request.headers)
     if auth_header:
         try:
             auth_token = auth_header.split(" ")[1]

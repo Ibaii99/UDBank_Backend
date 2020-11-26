@@ -29,7 +29,7 @@ class DatabaseEngine:
     
     def is_password_correct(self, username: str, password:str):
         try:
-            user = self.collection_users.find_one({"username": username, 'password': HASH.hash(password)})
+            user = self.collection_users.find_one({"username": username, 'password': password})
             if user is not None:
                 return True 
             else:
@@ -59,13 +59,15 @@ class DatabaseEngine:
             return False
 
     def modify_user(self, username: str, password: str, user: User):
-        self.collection_users.update_one({"username": username, "password": password}, { "$set": user.jsonify() })
+        modify = self.collection_users.update_one({"username": username, "password": password}, { "$set": user.jsonify() })
+        if modify:
+            return True
+        
+        return False
 
 
     
     def save_session(self, session_data):
-        logging.warning(session_data)
-
         _session_id = session_data["session_id"]
         _username = session_data["username"]
         timestamp = datetime.datetime.now().timestamp()
@@ -74,19 +76,15 @@ class DatabaseEngine:
             'session_id': HASH.hash(_session_id),
             'timestamp': timestamp
         }
-        logging.warning(session)
         self.collection_sessions.insert_one(session)
 
         return session
     
     def remove_session(self, session):
-        logging.warning(session)
-
         _session= {
             'username': HASH.hash(session.get("username")),
             'session_id': HASH.hash(session.get("session_id"))
         }
-        logging.warning(_session)
         removed = self.collection_sessions.delete_one(_session)
         if removed:
             return True

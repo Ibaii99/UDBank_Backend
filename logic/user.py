@@ -47,6 +47,22 @@ class User:
                 "interested_in": self.interested_in
                 }
 
+    def safe_jsonify(self):
+        return {
+                "id": self.id,
+                "username": self.username,
+                "email": self.email,
+                "first_name": self.first_name,
+                "last_name": self.last_name,
+                "address": self.address,
+                "city": self.city,
+                "country": self.country,
+                "postal_code": self.postal_code,
+                "about": self.about,
+                "interested_in": self.interested_in
+                }
+
+
     def json_cookie_payload(self):
         return {
                 "username": self.username,

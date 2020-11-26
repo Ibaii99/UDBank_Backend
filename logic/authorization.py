@@ -19,9 +19,8 @@ class Authorization:
             session = sessions.get(session_cookie)
             if session:
                 diff = abs(float(session.get('timestamp')) - float(datetime.datetime.now().timestamp()))
-                logging.warning(diff)
                 if diff > 28800:
-                    remove = sessions.remove(session)
+                    remove = sessions.remove(session_cookie)
                     return False
                 return True
         return False
@@ -31,6 +30,7 @@ class Authorization:
         sessions = SessionsController()
         if user:
             sessions.save(user.json_cookie_payload())
+            return True
         return False
 
     @staticmethod

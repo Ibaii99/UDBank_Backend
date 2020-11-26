@@ -52,15 +52,14 @@ def check_api_key():
             auth = request.headers.get("Authorization")
         except:
             auth = None
-
         if (api_key is not None and auth is not None):
             if not Authorization.authorize_user_token(request) or not Authorization.authorize_front(api_key):  
-                abort(403)
+                abort(401)
             else:
                 pass
         elif (api_key is not None and auth is None):
             if not Authorization.authorize_front(api_key) and is_get_token_route(request.url_rule):
-                abort(403)
+                abort(401)
             else: 
                 pass
         else:
