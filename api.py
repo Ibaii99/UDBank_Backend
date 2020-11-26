@@ -8,7 +8,7 @@ import logging
 
 from logic.authorization import Authorization
 
-app = Flask(__name__)
+application = Flask(__name__)
 application.register_blueprint(api_markets.markets_blueprint, url_prefix=config.API_URL_PREFIX+"/market")
 application.register_blueprint(api_users.users_blueprint, url_prefix=config.API_URL_PREFIX + "/user")
 
