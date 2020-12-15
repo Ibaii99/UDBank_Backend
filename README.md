@@ -7,4 +7,6 @@
 
 ## Lanzar el Backend
 
-1. Dentro del entorno virtual con las dependencias instaladas ejecutar ```python api.py```
+Dentro del entorno virtual con las dependencias instaladas ejecutar ```python api.py```
+
+Ahora se pueden consultar los endpoint en la url localhost:3000 o 192.168.0.X:3000
